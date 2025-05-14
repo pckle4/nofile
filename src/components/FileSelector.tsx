@@ -1,22 +1,19 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload } from 'lucide-react';
-import { useWebRTCContext } from '../context/WebRTCContext';
+import { useFileUpload } from '../hooks/useFileUpload';
 
 const FileSelector: React.FC = () => {
-  const { sendFile, connectionStatus } = useWebRTCContext();
+  const { uploadFile } = useFileUpload();
   
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      acceptedFiles.forEach(file => sendFile(file));
+      acceptedFiles.forEach(file => uploadFile(file));
     },
-    [sendFile]
+    [uploadFile]
   );
   
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
-    onDrop,
-    disabled: connectionStatus !== 'connected'
-  });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
   
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -28,7 +25,6 @@ const FileSelector: React.FC = () => {
             ? 'border-primary-500 bg-primary-50 scale-102' 
             : 'border-neutral-300 hover:border-primary-400 bg-white hover:bg-neutral-50'
           }
-          ${connectionStatus !== 'connected' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         `}
       >
         <input {...getInputProps()} />
@@ -48,19 +44,11 @@ const FileSelector: React.FC = () => {
           </h3>
           
           <p className="text-neutral-600 mb-4">
-            {connectionStatus === 'connected' 
-              ? 'Drag & drop files here or click to select' 
-              : 'Connect to a peer first to share files'}
+            Drag & drop files here or click to select
           </p>
           
           <button 
-            className={`
-              px-6 py-3 rounded-lg font-medium transition-all duration-300
-              ${connectionStatus === 'connected'
-                ? 'bg-primary-500 text-white hover:bg-primary-600 hover:scale-105'
-                : 'bg-neutral-200 text-neutral-500 cursor-not-allowed'}
-            `}
-            disabled={connectionStatus !== 'connected'}
+            className="px-6 py-3 bg-primary-500 text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary-600 hover:scale-105"
           >
             Select Files
           </button>
